@@ -355,7 +355,7 @@ def load_samples(xlsx: Path, sites: pd.DataFrame, qa: list[QAIssue],
     out = out.dropna(subset=["date", "mpn"]).sort_values(["site_id", "date"]).reset_index(drop=True)
 
     # Other QA observations
-    wd = out.date.dt.dayofweek
+    wd = out.date.dt.day_of_week
     nthu = int((wd != 3).sum())
     if nthu:
         qa.append(QAIssue("Rainfall",
