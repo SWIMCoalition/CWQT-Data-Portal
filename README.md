@@ -5,14 +5,7 @@ results from the CWQT program, based on the CWQT master Google Sheet.
 
 **Data Portal:** <https://SWIMCoalition.github.io/CWQT-Data-Portal/>
 
-**CWQT Master Google Sheet:** <https://docs.google.com/spreadsheets/d/1813b2nagaxZ80xRfyMZNNKySZOitro5Nt7W4E9WNQDA/edit?pli=1&gid=1924583806#gid=1924583806>
-
-```
-CWQT master Google Sheet
-        │  downloaded daily at 7:17 am ET (GitHub Actions)
-        ▼
-cwqt_visualize.py + templates/  ──►  map, charts page, PDFs  ──►  GitHub Pages
-```
+**More about CWQT:** <https://www.swimmablenyc.org/cwqt>
 
 Results entered in the master sheet automatically appear on the map the next morning.
 
@@ -29,34 +22,10 @@ Results entered in the master sheet automatically appear on the map the next mor
 | `status.json` | Written by the daily job: latest sample date, sample count and site count. A new commit means new data arrived. |
 | `.gitignore` | Keeps the workbook and generated files out of the repository. |
 
-## What the script produces
-
-| Output | Shows | Published on the site? |
-|---|---|---|
-| `index.html` | The map page. It has a SWIM banner with a **Charts & Graphics** button and a **Layers** menu: CWQT results by season, "Latest 30 days", "All seasons" and earlier seasons, plus basemap choices and a streams overlay. Clicking a site shows its stats, a mini trend chart and a link to its full time series. (`cwqt_map.html` is a copy, so the old address still works.) | Yes |
-| `charts.html` | Charts & Graphics page: "Data through" date and summary numbers, each chart with a short description, and a list of every site's time-series PDF | Yes |
-| `cwqt.css` | Shared styles for both pages (copied from `templates/`) | Yes |
-| `1_program_trend.png` | Typical site geomean by season (all sites, and long-running sites only) and % of samples over 104, wet vs dry weather | Yes |
-| `2_site_by_season_heatmap.png` | Every site × every season, colored good / advisory / poor | Yes |
-| `3_rainfall_effect.png` | Bacteria levels by rainfall in the ~72 hours before sampling | Yes |
-| `4_waterbody_comparison.png` | Geomean by waterbody over the last 5 seasons, with one dot per site | Yes |
-| `5_latest_30_day_status.png` | 30-day geomean for each site (same calculation as the sheet's GeoMean tabs) | Yes |
-| `site_timeseries.pdf` | One page per site: every regular-season sample, by season | Yes |
-| `sites/site-NNN.pdf` | The same page for each site on its own (NNN = Site ID), linked from the map popups and the charts page | Yes |
-| `tables/*.csv` | The numbers behind every chart | No |
-| `data_quality_report.txt` | Problems found in the sheet (bad coordinates, duplicate rows, names out of sync, lab QC notes…) | No |
-| `status.json` | Latest sample date and counts | Committed to the repository |
-
-Published files are reachable by name, e.g. `…/CWQT-Data-Portal/1_program_trend.png`. What gets
-published is set in the "Choose what gets published" step of the workflow.
-
----
-
 ## How the numbers are calculated
 
-The script follows the sheet's FAQ and its GeoMean tabs. Each run, it recalculates the
-**30 Day GeoMean Primary Contact** tab and prints whether every site matches (it should report
-79/79 or similar).
+Each run, the script recalculates the **30 Day GeoMean Primary Contact** tab and prints whether 
+every site matches.
 
 - **Censored results:** `<10` counts as 10, `>24196` as 24196 and `>6000` as 6000.
 - **Geometric mean** = exp(mean(ln(MPN))).
@@ -75,7 +44,7 @@ The script follows the sheet's FAQ and its GeoMean tabs. Each run, it recalculat
 - **Wet weather** = at least 0.25" of rain at Central Park on the sampling day plus the 2 days
   before. Precipitation text is cleaned up first: "Trace" counts as 0, and "0.45 (3.2 snow)" counts
   as 0.45.
-- **Lab/field splits** recorded in Notes are ignored by default, so the numbers match the GeoMean
+- **Lab/field splits** recorded in Notes are ignored as of now, so the numbers match the GeoMean
   tabs. Run with `--average-splits` to average them as the FAQ describes.
 
 To change any of these, edit the CONFIGURATION section of `cwqt_visualize.py`
@@ -199,34 +168,6 @@ Options:
 
 Outputs go to `cwqt_outputs/` (or the `--out` folder). Open `index.html` there in a browser to
 preview the portal before publishing.
-
----
-
-## Setup (for a new copy or after transferring the repository)
-
-1. **Public repository** with these files. Free GitHub Pages requires a public repository.
-2. **Sheet access.** Either:
-   - share the sheet as *Anyone with the link → Viewer*; or
-   - keep it private: create a Google Cloud service account, enable the Drive API, share the sheet
-     with the service account's email, and download its JSON key.
-3. **Secrets** (Settings → Secrets and variables → Actions):
-   - `CWQT_SHEET_ID`
-   - `GOOGLE_SERVICE_ACCOUNT_JSON` (private sheet only)
-4. **Pages:** Settings → Pages → Source: **GitHub Actions**.
-5. **First run:** Actions → *Update CWQT map* → **Run workflow**. The site address appears under
-   Settings → Pages.
-6. **Wix:** Add Elements → Embed Code → **Embed a site** → the Pages address.
-
-**Moving the repository to another account:** use Settings → General → Transfer ownership, or copy
-the files into a new repository there. Then:
-- re-add the secrets;
-- turn Pages back on;
-- **update the Wix embed and any shared links**, because the site address changes to
-  `https://<new-owner>.github.io/CWQT-Data-Portal/`;
-- add SWIM staff as collaborators so failure emails reach someone who can act on them.
-
-If you *copy* rather than transfer, disable the workflow in the old repository (Actions → *Update CWQT
-map* → ⋯ → Disable workflow). Otherwise both copies keep publishing every morning.
 
 ---
 
